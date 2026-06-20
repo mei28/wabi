@@ -2,6 +2,13 @@
 name = "wabi"
 version = "0.1.0"
 edition = "2021"
+description = "Render cached Claude and Codex rate-limit usage in terminal status surfaces (statusline, tmux)."
+license = "MIT"
+repository = "https://github.com/mei28/wabi"
+readme = "README.md"
+authors = ["mei <mei28aquarius@gmail.com>"]
+keywords = ["cli", "claude", "codex", "rate-limit", "statusline"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 anyhow = "1"
