@@ -98,6 +98,10 @@ pub fn render_missing_state(path: &std::path::Path) -> String {
     format!("wabi: no state at {}; run wabi update", path.display())
 }
 
+pub fn render_refreshing_state() -> String {
+    "wabi: refreshing... (run in progress)".to_string()
+}
+
 fn render_provider(
     name: &str,
     state: &ProviderState,
