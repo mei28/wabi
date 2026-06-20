@@ -1,0 +1,23 @@
+{
+  "five_hour": {
+    "utilization": 22.0,
+    "resets_at": "2026-06-20T10:09:59.871382+00:00"
+  },
+  "seven_day": {
+    "utilization": 13.0,
+    "resets_at": "2026-06-21T06:59:59.871405+00:00"
+  },
+  "extra_usage": {
+    "ignored": true
+  },
+  "limits": [
+    {
+      "kind": "session",
+      "percent": 22,
+      "resets_at": "2026-06-20T10:09:59.871382+00:00"
+    }
+  ],
+  "spend": {
+    "ignored": true
+  }
+}
