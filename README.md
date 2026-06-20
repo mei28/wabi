@@ -1,32 +1,70 @@
 # wabi
 
-`wabi` is a Rust CLI scaffold for rendering cached Claude and Codex rate
-limit usage in terminal status surfaces.
+`wabi` renders cached Claude and Codex rate-limit usage for terminal status
+surfaces such as statuslines and tmux.
 
-The current implementation is a scaffold path. `wabi update` writes explicit
-provider errors instead of calling real APIs, reading credentials, or spawning
-`codex app-server`.
+It targets macOS and Unix-like systems. Claude usage depends on the macOS
+Keychain, and background refresh uses Unix process behavior.
 
-## Usage
+## Install
+
+After crates.io publication:
 
 ```sh
-just check
-cargo run -- update
-cargo run -- status
-cargo run -- status --tmux
-cargo run -- status --max-age 300
-cargo run -- status --no-refresh
-cargo run -- tick
-cargo run -- json
+cargo install wabi
 ```
+
+From source:
+
+```sh
+cargo build --release
+```
+
+The built binary is available at `target/release/wabi`.
+
+## Data Sources
+
+`wabi update` collects each provider independently and writes one cached state
+file. If a provider fails, the error is recorded for that provider and the
+state file is still updated.
+
+- Claude usage is read from Anthropic's OAuth usage endpoint. `wabi` obtains
+  the Claude Code OAuth token from the macOS Keychain service
+  `Claude Code-credentials`.
+- Codex usage is read by spawning `codex app-server` and requesting account
+  rate limits through its JSON-RPC interface.
+
+## Commands
+
+```sh
+wabi update
+wabi status
+wabi status --tmux
+wabi status --max-age 300
+wabi status --no-refresh
+wabi tick
+wabi tick --max-age 300
+wabi json
+```
+
+- `wabi update` refreshes provider data and writes the cache.
+- `wabi status` prints the cached state using ANSI color.
+- `wabi status --tmux` prints tmux-compatible color formatting.
+- `wabi status --max-age <secs>` changes the cache TTL from the default 120
+  seconds.
+- `wabi status --no-refresh` prints the cache without starting background
+  refresh.
+- `wabi tick --max-age <secs>` performs only the lazy refresh check and prints
+  nothing.
+- `wabi json` prints the cached state as formatted JSON.
+
+## State
 
 State is stored at:
 
 ```text
 ${XDG_STATE_HOME:-$HOME/.local/state}/wabi/state.json
 ```
-
-## Lazy refresh
 
 `wabi status` always prints the cached state immediately. By default, it also
 checks the cache age before rendering. If `collected_at` is older than 120
@@ -43,36 +81,5 @@ If another update already holds the lock, the command exits successfully
 without doing duplicate provider work. The lock is released by the operating
 system when the process exits.
 
-Use these flags and commands to control refresh behavior:
-
-- `wabi status --max-age <secs>` changes the TTL from the default 120 seconds.
-- `wabi status --no-refresh` renders the cache without starting background work.
-- `wabi tick --max-age <secs>` only triggers the lazy refresh check and prints
-  nothing.
-
-This replaces a resident launchd job; statusline and tmux callers can run
+This replaces a resident launchd job. Statusline and tmux callers can run
 `wabi status` directly.
-
-## Manual verification (TODO before finalizing parsers)
-
-Run these only when you are ready to verify real response shapes:
-
-```sh
-curl -s https://api.anthropic.com/api/oauth/usage \
-  -H "anthropic-beta: oauth-2025-04-20" \
-  -H "authorization: Bearer <token>" | jq
-```
-
-```sh
-codex app-server
-# Then send JSON-RPC initialize and account/rateLimits/read messages over stdio.
-```
-
-Fields currently assumed by fixture parsers:
-
-- Claude: `rate_limits.five_hour.used_percentage`,
-  `rate_limits.five_hour.resets_at`,
-  `rate_limits.seven_day.used_percentage`,
-  `rate_limits.seven_day.resets_at`
-- Codex: `result.primary.usedPercent`, `result.primary.resetsAt`,
-  `result.secondary.usedPercent`, `result.secondary.resetsAt`
