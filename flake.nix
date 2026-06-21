@@ -21,7 +21,7 @@
             pkgs = import nixpkgs { inherit system; };
             wabi = pkgs.rustPlatform.buildRustPackage {
               pname = "wabi";
-              version = "0.1.0";
+              version = "0.1.1";
               src = ./.;
               cargoLock = {
                 lockFile = ./Cargo.lock;

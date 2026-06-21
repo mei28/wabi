@@ -1,6 +1,6 @@
 [package]
 name = "wabi"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Render cached Claude and Codex rate-limit usage in terminal status surfaces (statusline, tmux)."
 license = "MIT"

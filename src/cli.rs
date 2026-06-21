@@ -114,7 +114,7 @@ fn json() -> Result<()> {
 fn provider_result(result: Result<ProviderState>) -> ProviderState {
     match result {
         Ok(state) => state,
-        Err(error) => ProviderState::error(error.to_string()),
+        Err(error) => ProviderState::error(format!("{error:#}")),
     }
 }
 
